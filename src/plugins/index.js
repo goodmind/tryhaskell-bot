@@ -6,6 +6,6 @@ export let plugins = [
   {
     type: Update,
     name: 'tryhaskell',
-    path: /(?:[\s\S]*)/,
+    pattern: /(?:[\s\S]*)/,
     component: TryHaskell}
 ]
