@@ -1,22 +1,22 @@
 import { Observable as $ } from 'rx'
-import { values } from 'ramda'
+import { values, prop } from 'ramda'
 
 import { run } from '@cycle/core'
 import { makeHTTPDriver } from '@cycle/http'
 import { makeTelegramDriver } from 'cycle-telegram'
-import { matchPlugin } from 'cycle-telegram/plugins'
+import { matchWith } from 'cycle-telegram/plugins'
 
 import { plugins } from './plugins'
 
 let intent = (sources) => ({
   messages: sources.bot
     .events('message')
-    ::matchPlugin(plugins, sources)
+    ::matchWith(plugins, sources)
     .share(),
 
   inlineQuery: sources.bot
     .events('inline_query')
-    ::matchPlugin(plugins, sources)
+    ::matchWith(plugins, sources)
     .share()
 })
 
@@ -30,13 +30,13 @@ let main = (sources) => {
 
   return {
     HTTP: $.merge(actions.inlineQuery, actions.messages)
+      .filter(prop('HTTP'))
       .pluck('HTTP')
       .mergeAll(),
 
     bot: model(actions, sources),
 
-    log: $.from(values(actions))
-      .mergeAll()
+    log: $.from(values(actions)).mergeAll()
   }
 }
 
